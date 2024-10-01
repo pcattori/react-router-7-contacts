@@ -1,10 +1,10 @@
-import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router";
-import { Form, redirect, useLoaderData, useNavigate } from "react-router";
+import { Form, redirect, useNavigate } from "react-router";
 import invariant from "tiny-invariant";
 
+import type * as Route from "./+types.edit"
 import { getContact, updateContact } from "~/data";
 
-export const loader = async ({ params }: LoaderFunctionArgs) => {
+export const loader = async ({ params }: Route.LoaderArgs) => {
   invariant(params.contactId, "Missing contactId param");
   const contact = await getContact(params.contactId);
   if (!contact) {
@@ -13,7 +13,7 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
   return { contact };
 };
 
-export const action = async ({ params, request }: ActionFunctionArgs) => {
+export const action = async ({ params, request }: Route.ActionArgs) => {
   invariant(params.contactId, "Missing contactId param");
   const formData = await request.formData();
   const updates = Object.fromEntries(formData);
@@ -21,8 +21,8 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
   return redirect(`/contacts/${params.contactId}`);
 };
 
-export default function EditContact() {
-  const { contact } = useLoaderData() as Awaited<ReturnType<typeof loader>>;
+export default function EditContact({ loaderData}: Route.ComponentProps) {
+  const { contact } = loaderData
   const navigate = useNavigate();
 
   return (

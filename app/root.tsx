@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import {
   Form,
   Links,
@@ -6,18 +7,16 @@ import {
   ScrollRestoration,
   LinksFunction,
   Outlet,
-  useLoaderData,
   redirect,
   NavLink,
   useNavigation,
-  LoaderFunctionArgs,
   useSubmit,
 } from "react-router";
 
-import { createEmptyContact, getContacts } from "./data";
 
+import type * as Route from "./+types.root"
 import appStylesHref from "./app.css?url";
-import { useEffect } from "react";
+import { createEmptyContact, getContacts } from "./data";
 
 export const links: LinksFunction = () => [
   { rel: "stylesheet", href: appStylesHref },
@@ -29,15 +28,15 @@ export const action = async () => {
   return redirect(`/contacts/${contact.id}/edit`);
 };
 
-export const loader = async ({ request }: LoaderFunctionArgs) => {
+export const loader = async ({ request }: Route.LoaderArgs) => {
   const url = new URL(request.url);
   const q = url.searchParams.get("q");
   const contacts = await getContacts(q);
   return { contacts, q };
 };
 
-export default function App() {
-  const { contacts, q } = useLoaderData() as Awaited<ReturnType<typeof loader>>;
+export default function App({loaderData}: Route.ComponentProps) {
+  const { contacts, q } = loaderData
   const navigation = useNavigation();
   const submit = useSubmit();
   const searching =
